@@ -1,0 +1,42 @@
+# exp
+
+x = py.list(10..<20)
+print(x)
+
+#! --
+print(10..20)
+print(10..<20)
+
+for i in 1..<5:
+    print(i * 2)
+;
+#--
+
+t0 = [
+    pi = 3.14
+    f = {r -> return r * r * @pi}
+]
+
+print(t0.f(4))
+
+t1 = [
+    metatable = t0
+]
+
+print(t1.f(4))
+
+t2 = [
+    pi = 3
+    metatable = t1
+]
+
+print(t2.f(4))
+
+# "%" expression
+
+g = {%0 + %1}
+print(g(4, 5))
+
+x = 'a' if g(2, 3) else 'b'
+
+print(x)

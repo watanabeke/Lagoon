@@ -1,0 +1,26 @@
+# default args
+
+f = {x=[1], y~=[1] ->
+    x.append(0)
+    y.append(0)
+    print(x)
+    print(y)
+}
+f()
+f()
+f()
+f()
+
+g = {foo, bar=30, baz=20 ->
+    print(foo + bar + baz)
+}
+
+g(1)
+g(2, 3)
+g(2, baz=5)
+
+h = {a, b ->
+    return (a + b) + (a * b)
+}
+
+print(h(2, 3))

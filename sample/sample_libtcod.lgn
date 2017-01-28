@@ -1,0 +1,115 @@
+sys = import("sys")
+os = import("os")
+os.chdir(os.path.join(os.path.dirname(__lagoonfile__), "libtcod"))
+sys.path.append(os.path.abspath("."))
+libtcod = import("libtcodpy")
+
+SCREEN_WIDTH = 80
+SCREEN_HEIGHT = 50
+
+STAGE_WIDTH = 80
+STAGE_HEIGHT = 45
+
+LIMIT_FPS = 20
+
+$color_dark_wall = libtcod.Color(0, 0, 100)
+$color_dark_ground = libtcod.Color(50, 50, 150)
+
+Tile = T[]
+Tile.new = {blocked, block_sight=none ->
+    return [
+        metatable = Tile
+        blocked = blocked
+        block_sight = block_sight
+    ]
+}
+
+Entity = [
+    move = {dx, dy ->
+        if not $stage(!@x + dx)(!@y + dy).blocked:
+            @x += dx
+            @y += dy
+        ;
+    }
+    draw = {
+        libtcod.console_set_default_foreground($con, @color)
+        libtcod.console_put_char($con, @x, @y, @char, libtcod.BKGND_NONE)
+    }
+    clear = {
+        libtcod.console_put_char($con, @x, @y, b" ", libtcod.BKGND_NONE)
+    }
+]
+Entity.new = {x, y, char, color ->
+    return [
+        metatable = Entity
+        x = x
+        y = y
+        char = char
+        color = color
+    ]
+}
+
+make_stage = {
+    $stage = [[Tile.new(false) for y in 0..<STAGE_HEIGHT] for x in 0..<STAGE_WIDTH]
+    $stage!30!22.blocked = true
+    $stage!30!22.block_sight = true
+    $stage!50!22.blocked = true
+    $stage!50!22.block_sight = true
+}
+
+render_all = {
+    for y in 0..<STAGE_HEIGHT:
+        for x in 0..<STAGE_WIDTH:
+            wall = $stage(!x)(!y).block_sight
+            if wall:
+                libtcod.console_set_char_background($con, x, y, $color_dark_wall, libtcod.BKGND_SET)
+            else:
+                libtcod.console_set_char_background($con, x, y, $color_dark_ground, libtcod.BKGND_SET)
+            ;
+        ;
+    ;
+    for entity in $entities:
+        entity.draw()
+    ;
+    libtcod.console_blit($con, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0, 0)
+}
+
+handle_keys = {
+    key = libtcod.console_wait_for_keypress(true)
+    if key.vk == libtcod.KEY_ESCAPE:
+        return true
+    else:
+        if libtcod.console_is_key_pressed(libtcod.KEY_UP):
+            $player.move(0, -1)
+        elseif libtcod.console_is_key_pressed(libtcod.KEY_DOWN):
+            $player.move(0, 1)
+        elseif libtcod.console_is_key_pressed(libtcod.KEY_LEFT):
+            $player.move(-1, 0)
+        elseif libtcod.console_is_key_pressed(libtcod.KEY_RIGHT):
+            $player.move(1, 0)
+        ;
+        return false
+    ;
+}
+
+libtcod.console_set_custom_font(b"terminal.png")
+libtcod.console_init_root(SCREEN_WIDTH, SCREEN_HEIGHT, b"Game", false)
+libtcod.sys_set_fps(LIMIT_FPS)
+$con = libtcod.console_new(SCREEN_WIDTH, SCREEN_HEIGHT)
+
+$player = Entity.new(Int(SCREEN_WIDTH / 2), Int(SCREEN_HEIGHT / 2), b'@', libtcod.white)
+npc = Entity.new(Int(SCREEN_WIDTH / 2) - 5, Int(SCREEN_HEIGHT / 2), b'@', libtcod.yellow)
+$entities = [npc, $player]
+make_stage()
+
+while not libtcod.console_is_window_closed():
+    render_all()
+    libtcod.console_flush()
+    for entity in $entities:
+        entity.clear()
+    ;
+    exit = handle_keys()
+    if exit:
+        break
+    ;
+;

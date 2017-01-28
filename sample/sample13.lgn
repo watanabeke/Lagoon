@@ -1,0 +1,17 @@
+$gg = 100
+print($gg)
+$gg += 1
+print($gg)
+
+ta = [
+    xx = 10
+    yy = {20 + 10}
+    get_zz = {@xx * 10}
+    set_ww = {%0 / 10}
+]
+
+print(ta.xx)
+print(ta.yy())
+print(ta.zz)
+ta.ww = 5
+print(ta.ww)

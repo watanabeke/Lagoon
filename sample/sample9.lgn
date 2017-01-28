@@ -1,0 +1,33 @@
+try:
+    print('10' + 20)
+except py.TypeError:
+    print('caught')
+;
+
+try:
+    raise py.TypeError
+except py.TypeError:
+    print('caught')
+;
+
+try:
+    raise py.TypeError
+except:
+    print('caught')
+;
+
+#!--
+try:
+    raise py.TypeError
+except py.KeyError:
+    print('caught')
+except py.AttributeError:
+    print('caught')
+;
+#--
+
+xx = [1, 2, 3]
+yy = xx!10 except py.IndexError then -1
+print(yy)
+
+assert yy == -1

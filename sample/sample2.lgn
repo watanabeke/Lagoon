@@ -1,0 +1,26 @@
+# comment
+
+# This is comment.
+
+# print('hay.')
+
+#!--
+multiline comment.
+very useful!
+#--
+
+#!--
+
+You can write...
+#!--
+    nested comments!
+#--
+
+    # yay.
+
+#--
+
+# easy way to cancel comment out.
+#--
+    print('yap.')
+#--

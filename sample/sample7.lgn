@@ -1,0 +1,28 @@
+x = [1, 2, 3]
+
+y = ['four': 4, 'five': 5, 'six': 6]
+
+print(x)
+print(y)
+
+x = [i + 1 for i in x if i mod 2 == 0]
+
+y = [t!0: t!1 * 2 for t in y.items()]
+
+print(x)
+print(y)
+
+y = [k: v * 2 for k, v in y.items()]
+
+print(y)
+
+m = [i in 0..10 if i mod 2 == 0]
+
+print(m)
+
+a = t[10, 20, 30]
+b = g[10, 20, 30]
+c = o['four': 4, 'five': 5, 'six': 6]
+d = d[]
+
+print(a, b, c, d)

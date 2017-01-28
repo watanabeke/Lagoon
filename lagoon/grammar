@@ -1,0 +1,264 @@
+# general:
+
+program = Z* block? Z*
+
+block = _block_element (Z+ _block_element)*
+    _block_element = comm / stat / exp
+
+comm = _mul_comm / _one_comm
+
+stat =
+        assign /
+        if /
+        while /
+        for /
+        times /
+        continue /
+        break /
+        return /
+        try /
+        raise /
+        assert
+
+exp = _exp / DUMMY
+    _exp = _ope / _atom
+
+_atom =
+        number /
+        string /
+        table /
+        tuple /
+        set /
+        frozenset /
+        generator /
+        list /
+        ordereddict /
+        dict /
+        callable /
+        ref_name
+
+
+# comment:
+
+_mul_comm = _mul_comm_B (_mul_comm / _mul_comm_n / Z)* _mul_comm_E
+    _mul_comm_B = "#!--"
+    _mul_comm_n = !_mul_comm_B !_mul_comm_E ~"."
+    _mul_comm_E = "#--"
+
+_one_comm = ~"#[^\n]*"
+
+
+# statement:
+
+assign = assign_left Z* assign_ope Z* assign_right
+    assign_left = chain (Z* "," Z* chain)*
+    assign_right = exp (Z* "," Z* exp)*
+    assign_ope =
+            assign_ope_ /
+            assign_ope_add /
+            assign_ope_sub /
+            assign_ope_mul /
+            assign_ope_div
+        assign_ope_ = "="
+        assign_ope_add = "+="
+        assign_ope_sub = "-="
+        assign_ope_mul = "*="
+        assign_ope_div = "/="
+
+if = if_if if_elseif* if_else? ";"
+    if_if = "if" Z+ exp Z? ":" Z+ block Z+
+    if_elseif = "elseif" Z+ exp Z? ":" Z+ block Z+
+    if_else = "else" Z? ":" Z+ block Z+
+
+while = "while" Z+ exp Z? ":" Z+ block Z+ ";"
+
+for = "for" Z+ assign_left Z+ "in" Z+ exp Z? ":" Z+ block Z+ ";"
+
+times = "times" Z+ exp Z? ":" Z+ block Z+ ";"
+
+continue = "continue"
+
+break = "break" (Z+ exp)?
+
+return = "return" (Z+ exp)?
+
+try = try_try try_except+ ";"
+    try_try = "try" Z? ":" Z+ block Z+
+    try_except = "except" (Z+ exp (Z+ "as" Z+ name)?)? Z? ":" Z+ block Z+
+
+raise = "raise" (Z+ exp)?
+
+assert = "assert" (Z+ exp)?
+
+# operand:
+
+_ope0 = ("(" exp ")") / _atom
+
+_ope1 = _ope0
+
+_ope2 = chain / _ope1
+    chain = _chain_o / DUMMY
+    _chain_o = (_ope1 / symbolattr_name / symbolindex_name) (_chain_a / _chain_c / _chain_i)?
+    _chain_a = attr_dot (_chain_a / _chain_c / _chain_i)?
+    _chain_c = call_paren (_chain_a / _chain_c / _chain_i)?
+    _chain_i = index_ope (_chain_a / _chain_c / _chain_i)?
+        attr_dot = "." name
+        call_paren = "(" Z* _call_paren_args? Z* ")"
+            _call_paren_args = call_paren_arg (("," / N+) Z* call_paren_arg Z*)*
+            call_paren_arg = (name Z* "=" Z*)? exp
+        index_ope = _index_ope_noparen / _index_ope_paren
+            _index_ope_noparen = "!" Z* _ope1
+            _index_ope_paren = "(!" Z* exp ")"
+        symbolattr_name = symbolattr (name / symbolattr)*
+        symbolindex_name = symbolindex number
+
+_ope2a = range / _ope2
+    range = range_start? range_ope range_stop
+        range_start = _ope2 / DUMMY
+        range_ope = range_ope_opened / range_ope_closed
+            range_ope_closed = ".."
+            range_ope_opened = "..<"
+        range_stop = _ope2 / DUMMY
+
+_ope3 = pow / _ope2a
+    pow = _ope2a Z* "pow" Z* _ope3
+
+_ope4 = pos / neg / _ope3
+    pos = "+" Z* _ope4
+    neg = "-" Z* _ope4
+
+_ope5 = mul / truediv / mod / _ope4
+    mul = _ope4 Z* "*" Z* _ope5
+    truediv = _ope4 Z* "/" Z* _ope5
+    mod = _ope4 Z* "mod" Z* _ope5
+
+_ope6 = add / sub / _ope5
+    add = _ope5 Z* "+" Z* _ope6
+    sub = _ope5 Z* "-" Z* _ope6
+
+_ope7 = lt / le / eq / ne / ge / gt / _ope6
+    lt = _ope6 Z* "<" Z* _ope7
+    le = _ope6 Z* "<=" Z* _ope7
+    eq = _ope6 Z* "==" Z* _ope7
+    ne = _ope6 Z* "!=" Z* _ope7
+    ge = _ope6 Z* ">=" Z* _ope7
+    gt = _ope6 Z* ">" Z* _ope7
+
+_ope8 = is_ / contains / isa / _ope7
+    is_ = _ope7 Z+ "is" Z+ _ope8
+    contains = _ope7 Z+ "in" Z+ _ope8
+    isa = _ope7 Z+ "isa" Z+ _ope8
+
+_ope9 = not_ / _ope8
+    not_ = "not" Z+ _ope9
+
+_ope10 = and_ / or_ / _ope9
+    and_ = _ope9 Z+ "and" Z+ _ope10
+    or_ = _ope9 Z+ "or" Z+ _ope10
+
+_ope11 = one_if / _ope10
+    one_if = _ope10 Z+ "if" Z+ _ope11 Z+ "else" Z+ _ope11
+
+_ope12 = one_try / _ope11
+    one_try = _ope11 Z+ "except" Z+ _ope12 Z+ "then" Z+ _ope12
+
+_ope = _ope12 / DUMMY
+
+
+# expression:
+
+number = ~"[0-9]+(\.[0-9]+)?"
+
+string = string_macros string_body
+    string_body = sq_heredoc / dq_heredoc / sq_string / dq_string
+    sq_heredoc = "'''" sq_heredoc_contents "'''"
+        sq_heredoc_contents = sq_heredoc_char*
+            sq_heredoc_char = !"'''" ~"[^\\\\]|\\\\."
+    dq_heredoc = "\"\"\"" dq_heredoc_contents "\"\"\""
+        dq_heredoc_contents = dq_heredoc_char*
+            dq_heredoc_char = !"\"\"\"" ~"[^\\\\]|\\\\."
+    sq_string = "'" sq_string_contents "'"
+        sq_string_contents = sq_string_char*
+            sq_string_char = !"'" ~"[^\\\\]|\\\\."
+    dq_string = "\"" dq_string_contents "\""
+        dq_string_contents = dq_string_char*
+            dq_string_char = !"\"" ~"[^\\\\]|\\\\."
+    string_macros = ("a" / "l" / "r" / "d" / "i" / "~" / "b")*
+
+sequence = "[" Z* (sequence_gen / sequence_items)? Z* "]"
+    sequence_gen = sequence_gen_for? sequence_gen_in sequence_gen_if?
+        sequence_gen_for = exp Z+ "for" Z+
+        sequence_gen_in = assign_left Z+ "in" Z+ exp
+        sequence_gen_if = Z+ "if" Z+ exp
+    sequence_items = exp S* (("," / N+) Z* exp S*)*
+
+list = "l"? sequence
+
+tuple = "t" sequence
+
+set = "s" sequence
+
+frozenset = "f" sequence
+
+generator = "g" sequence
+
+mapping = "[" Z* (mapping_gen / mapping_items)? Z* "]"
+    mapping_gen =  mapping_gen_for? mapping_gen_in mapping_gen_if?
+        mapping_gen_for = exp Z* ":" Z* exp Z+ "for" Z+
+        mapping_gen_in = assign_left Z+ "in" Z+ exp
+        mapping_gen_if = Z+ "if" Z+ exp
+    mapping_items = mapping_item S* (("," / N+) Z* mapping_item S*)*
+        mapping_item = exp Z* ":" Z* exp
+
+dict = "d"? mapping
+
+ordereddict = "o" mapping
+
+table = "T"? "[" Z* _table_items? Z* "]"
+    _table_items = table_item S* (("," / N+) Z* table_item S*)*
+    table_item = name Z* "=" Z* exp
+
+callable = _callable_without_arrow / _callable_with_arrow
+    _callable_without_arrow = "{" Z* block Z* "}"
+    _callable_with_arrow = "{" Z* _callable_args? "->" Z* block Z* "}"
+        _callable_args = callable_arg Z* ("," Z* callable_arg Z*)*
+        callable_arg = name (Z* callable_arg_ope Z* exp)*
+        callable_arg_ope = callable_arg_ope_static / callable_arg_ope_dynamic
+        callable_arg_ope_static = "="
+        callable_arg_ope_dynamic = "~="
+
+
+# characters:
+
+name = !R ~"[a-zA-Z_][0-9a-zA-Z_]*"
+ref_name = !R ~"[a-zA-Z_][0-9a-zA-Z_]*"
+symbolattr = ~"[\\$@\\^]"
+symbolindex = ~"[%]"
+
+# reserved words
+R =
+        (
+            "if" /
+            "elseif" /
+            "else" /
+            "while" /
+            "do" /
+            "for" /
+            "times" /
+            "in" /
+            "continue" /
+            "break" /
+            "return" /
+            "try" /
+            "except" /
+            "raise" /
+            "then" /
+            "as"
+        )
+        !(~"[0-9a-zA-Z_]")
+
+Z = ~"[\s]"
+S = ~"[^\S\n]"
+N = ~"[\n]"
+
+DUMMY = ~"[^\s\S]"

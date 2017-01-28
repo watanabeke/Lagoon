@@ -1,0 +1,12 @@
+# operator
+
+x = 10
+x += 1
+print(x)
+x *= 2
+print(x)
+
+y = 10
+y = y * 20
+y += 1
+print(y)

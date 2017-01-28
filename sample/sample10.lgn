@@ -1,0 +1,13 @@
+li = [5, 9, 2, 4, 8, 8, 0, 10]
+
+print(li)
+print(li(!2 + 3))
+
+print(1..2)
+print(..3)
+print(..<10)
+
+# !--
+print(li!1..2)
+print(li(!3..<7))
+#--

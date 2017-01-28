@@ -1,0 +1,38 @@
+# expressions
+
+print(10)
+# print(0.5)
+
+print('hello world!')
+
+print([1,2, 3])
+
+print([
+    10
+    'days'
+    'vacation'
+    'is'
+    true
+    'fun'
+])
+
+print([1: 2, 3:4])
+
+print([
+    'example': 10
+    10: 'example'
+])
+
+t = [
+    xx = 1 + 2 * 3
+    yy = {s, t ->
+        print(s pow 2)
+        print(t pow 3)
+    }
+]
+
+print(t)
+print(t.xx)
+t.yy(4, 5)
+
+print([['a', 'b'], 'c'].pop(0)!1)

@@ -1,0 +1,39 @@
+# statements
+
+foo = 10
+print(foo)
+
+if foo:
+    print(20)
+elseif false:
+    print(100)
+else:
+    print(30)
+;
+
+while foo > 0:
+    print(foo)
+    foo = foo - 1
+;
+
+for i in ['h', 'e', 'l', 'l', 'o']:
+    print(i)
+;
+
+times 5:
+    print('repeat!')
+;
+
+while true:
+    print('once!')
+    break
+;
+
+while true:
+    while true:
+        while true:
+            print('once!!')
+            break 3
+        ;
+    ;
+;

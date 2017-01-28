@@ -1,0 +1,12 @@
+# multiple assign
+
+foo = 11 + 15
+print(foo)
+
+foo, bar = 11, 15
+print(foo)
+print(bar)
+
+foo0, bar0 = t[11, 15]
+print(foo0)
+print(bar0)

@@ -1,0 +1,3 @@
+print('test5a.lgn is surely executed')
+x = 'hello'
+y = 'this is test'

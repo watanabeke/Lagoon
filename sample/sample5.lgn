@@ -1,0 +1,10 @@
+# import
+
+print('I am {0}'.format('Lagoon'))
+
+math = import('math')
+print(math.pi)
+
+test = load('test5a.lgn')
+print(test.x)
+print(test.y)
